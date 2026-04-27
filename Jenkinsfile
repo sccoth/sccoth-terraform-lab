@@ -6,6 +6,7 @@ pipeline {
   }
 
   stages {
+
     stage('Terraform Init') {
       steps {
         dir('environments/dev') {
@@ -17,9 +18,21 @@ pipeline {
     stage('Terraform Plan') {
       steps {
         dir('environments/dev') {
-          sh 'terraform plan'
+          sh 'terraform plan -no-color'
         }
       }
     }
+
+    stage('Terraform Apply') {
+      when {
+        branch 'main'
+      }
+      steps {
+        dir('environments/dev') {
+          sh 'terraform apply -auto-approve -no-color'
+        }
+      }
+    }
+
   }
 }
