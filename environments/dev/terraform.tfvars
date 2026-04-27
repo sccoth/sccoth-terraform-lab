@@ -13,4 +13,9 @@ subnets = {
   ip_cidr_range = "10.11.0.0/16"
   region        = "us-central1"
 }
+  dev_db = {
+  name          = "dev-db-subnet"
+  ip_cidr_range = "10.12.0.0/16"
+  region        = "us-central1"
+}
 }
