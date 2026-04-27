@@ -1,6 +1,10 @@
 pipeline {
   agent any
 
+  environment {
+    GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sccoth-dev-sa')
+  }
+
   stages {
     stage('Terraform Init') {
       steps {
