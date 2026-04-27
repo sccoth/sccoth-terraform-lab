@@ -25,7 +25,9 @@ pipeline {
 
     stage('Terraform Apply') {
       when {
-        branch 'main'
+        expression {
+          env.BRANCH_NAME == 'main'
+        }
       }
       steps {
         dir('environments/dev') {
