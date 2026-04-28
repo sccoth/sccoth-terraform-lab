@@ -6,6 +6,12 @@ pipeline {
   }
 
   stages {
+    stage('Debug Branch') {
+      steps {
+        sh 'echo BRANCH_NAME=$BRANCH_NAME'
+        sh 'echo GIT_BRANCH=$GIT_BRANCH'
+      }
+    }
 
     stage('Terraform Init') {
       steps {
@@ -25,8 +31,9 @@ pipeline {
 
     stage('Terraform Apply') {
       when {
-        expression {
-          env.BRANCH_NAME == 'main'
+        anyOf {
+          branch 'main'
+          expression { env.GIT_BRANCH == 'origin/main' }
         }
       }
       steps {
@@ -35,6 +42,5 @@ pipeline {
         }
       }
     }
-
   }
 }
