@@ -4,7 +4,7 @@ variable "project_id" {
 
 variable "region" {
   type    = string
-  default = "us-central1"
+  default = "europe-west1"
 }
 
 variable "vpc_name" {
@@ -13,8 +13,12 @@ variable "vpc_name" {
 
 variable "subnets" {
   type = map(object({
-    name          = string
-    ip_cidr_range = string
-    region        = string
+    name                = string
+    ip_cidr_range       = string
+    region              = string
+    pods_range_name     = string
+    pods_ip_cidr_range  = string
+    svc_range_name      = string
+    svc_ip_cidr_range   = string
   }))
 }
