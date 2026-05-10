@@ -2,11 +2,8 @@ pipeline {
   agent any
 
   environment {
-    TF_DIR = 'environments/dev/network'
-}
-
-  environment {
     GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sccoth-dev-sa')
+    TF_DIR = 'environments/dev/network'
   }
 
   stages {
