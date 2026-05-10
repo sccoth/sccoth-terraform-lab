@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gcp-platform-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gcp-platform-lab
+  template:
+    metadata:
+      labels:
+        app: gcp-platform-lab
+    spec:
+      containers:
+        - name: gcp-platform-lab
+          image: europe-west1-docker.pkg.dev/sccoth-dev/gcp-lab-repo/gcp-platform-lab:latest
+          #image: gcp-platform-lab:local
+          #imagePullPolicy: Never
+          ports:
+            - containerPort: 80
