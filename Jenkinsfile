@@ -2,6 +2,10 @@ pipeline {
   agent any
 
   environment {
+    TF_DIR = 'environments/dev/network'
+}
+
+  environment {
     GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sccoth-dev-sa')
   }
 
@@ -15,7 +19,7 @@ pipeline {
 
     stage('Terraform Init') {
       steps {
-        dir('environments/dev') {
+        dir(env.TF_DIR) {
           sh 'terraform init'
         }
       }
@@ -23,7 +27,7 @@ pipeline {
 
     stage('Terraform Plan') {
       steps {
-        dir('environments/dev') {
+        dir(env.TF_DIR) {
           sh 'terraform plan -no-color'
         }
       }
@@ -37,7 +41,7 @@ pipeline {
         }
       }
       steps {
-        dir('environments/dev') {
+        dir(env.TF_DIR) {
           sh 'terraform apply -auto-approve -no-color'
         }
       }
