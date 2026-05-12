@@ -32,4 +32,5 @@ module "gke" {
   
   # test gke stack detection
   # trigger gke deployment
+  # trigger gke cluster deployment
 }
