@@ -17,7 +17,7 @@ pipeline {
                 script {
                     def changedFiles = sh(
                         script: '''
-                            git fetch origin main
+                            git fetch origin main:refs/remotes/origin/main
                             git diff --name-only origin/main...HEAD
                         ''',
                         returnStdout: true
