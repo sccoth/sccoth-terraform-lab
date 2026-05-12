@@ -3,16 +3,26 @@ provider "google" {
   region  = var.region
 }
 
+data "terraform_remote_state" "network" {
+  backend = "gcs"
+
+  config = {
+    bucket = "sccoth-terraform-state-dev"
+    prefix = "dev/network"
+  }
+}
+
 module "gke" {
   source = "../../../modules/gke"
 
-  project_id          = var.project_id
-  location            = var.zone
-  cluster_name        = var.cluster_name
-  network_name        = var.network_name
-  subnet_name         = var.subnet_name
-  pods_range_name     = var.pods_range_name
-  services_range_name = var.services_range_name
+  project_id   = var.project_id
+  location     = var.zone
+  cluster_name = var.cluster_name
+
+  network_name        = data.terraform_remote_state.network.outputs.vpc_name
+  subnet_name         = data.terraform_remote_state.network.outputs.subnet_name
+  pods_range_name     = data.terraform_remote_state.network.outputs.pods_range_name
+  services_range_name = data.terraform_remote_state.network.outputs.services_range_name
 
   node_pool_name = var.node_pool_name
   node_count     = var.node_count
