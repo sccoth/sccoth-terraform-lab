@@ -19,4 +19,6 @@ module "gke" {
   machine_type   = var.machine_type
   disk_type      = var.disk_type
   disk_size_gb   = var.disk_size_gb
+
+  test
 }
