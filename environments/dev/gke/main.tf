@@ -21,4 +21,5 @@ module "gke" {
   disk_size_gb   = var.disk_size_gb
   
   # test gke stack detection
+  # trigger gke deployment
 }
