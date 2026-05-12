@@ -56,9 +56,9 @@ pipeline {
                         echo "Running Terraform for ${stack}"
 
                         dir(stack) {
-                            sh 'terraform init'
+                            sh 'terraform init -input=false'
                             sh 'terraform validate'
-                            sh 'terraform plan -no-color'
+                            sh 'terraform plan -no-color -input=false'
                         }
                     }
                 }
@@ -77,7 +77,7 @@ pipeline {
                         echo "Applying Terraform for ${stack}"
 
                         dir(stack) {
-                            sh 'terraform apply -auto-approve'
+                            sh 'terraform apply -auto-approve -input=false'
                         }
                     }
                 }
