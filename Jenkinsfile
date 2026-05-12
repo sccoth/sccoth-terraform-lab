@@ -15,13 +15,22 @@ pipeline {
         stage('Detect Changed Terraform Stacks') {
             steps {
                 script {
-                    def changedFiles = sh(
-                        script: '''
-                            git fetch origin main:refs/remotes/origin/main
-                            git diff --name-only origin/main...HEAD
-                        ''',
-                        returnStdout: true
-                    ).trim()
+                    def changedFiles = ''
+
+                    if (env.BRANCH_NAME == 'main') {
+                        changedFiles = sh(
+                            script: 'git diff --name-only HEAD~1 HEAD',
+                            returnStdout: true
+                        ).trim()
+                    } else {
+                        changedFiles = sh(
+                            script: '''
+                                git fetch origin main:refs/remotes/origin/main
+                                git diff --name-only origin/main...HEAD
+                            ''',
+                            returnStdout: true
+                        ).trim()
+                    }
 
                     echo "Changed files:"
                     echo changedFiles
@@ -37,8 +46,7 @@ pipeline {
                     }
 
                     if (stacks.isEmpty()) {
-                        echo "No Terraform stack changes detected. Defaulting to dev/network for safety."
-                        stacks.add('environments/dev/network')
+                        echo "No Terraform stack changes detected. Skipping Terraform."
                     }
 
                     env.TF_STACKS = stacks.join(',')
@@ -48,6 +56,11 @@ pipeline {
         }
 
         stage('Terraform Init / Validate / Plan') {
+            when {
+                expression {
+                    return env.TF_STACKS?.trim()
+                }
+            }
             steps {
                 script {
                     def stacks = env.TF_STACKS.split(',')
@@ -67,7 +80,12 @@ pipeline {
 
         stage('Terraform Apply') {
             when {
-                branch 'main'
+                allOf {
+                    branch 'main'
+                    expression {
+                        return env.TF_STACKS?.trim()
+                    }
+                }
             }
             steps {
                 script {
