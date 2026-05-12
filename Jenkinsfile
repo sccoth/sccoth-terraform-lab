@@ -1,47 +1,87 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sccoth-dev-sa')
-    TF_DIR = 'environments/dev/network'
-  }
-
-  stages {
-    stage('Debug Branch') {
-      steps {
-        sh 'echo BRANCH_NAME=$BRANCH_NAME'
-        sh 'echo GIT_BRANCH=$GIT_BRANCH'
-      }
+    environment {
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sccoth-dev-sa')
     }
 
-    stage('Terraform Init') {
-      steps {
-        dir(env.TF_DIR) {
-          sh 'terraform init'
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
-    }
 
-    stage('Terraform Plan') {
-      steps {
-        dir(env.TF_DIR) {
-          sh 'terraform plan -no-color'
-        }
-      }
-    }
+        stage('Detect Changed Terraform Stacks') {
+            steps {
+                script {
+                    def changedFiles = sh(
+                        script: '''
+                            git fetch origin main
+                            git diff --name-only origin/main...HEAD
+                        ''',
+                        returnStdout: true
+                    ).trim()
 
-    stage('Terraform Apply') {
-      when {
-        anyOf {
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/main' }
+                    echo "Changed files:"
+                    echo changedFiles
+
+                    def stacks = []
+
+                    if (changedFiles.contains('environments/dev/network/') || changedFiles.contains('modules/network/')) {
+                        stacks.add('environments/dev/network')
+                    }
+
+                    if (changedFiles.contains('environments/dev/gke/') || changedFiles.contains('modules/gke/')) {
+                        stacks.add('environments/dev/gke')
+                    }
+
+                    if (stacks.isEmpty()) {
+                        echo "No Terraform stack changes detected. Defaulting to dev/network for safety."
+                        stacks.add('environments/dev/network')
+                    }
+
+                    env.TF_STACKS = stacks.join(',')
+                    echo "Terraform stacks to run: ${env.TF_STACKS}"
+                }
+            }
         }
-      }
-      steps {
-        dir(env.TF_DIR) {
-          sh 'terraform apply -auto-approve -no-color'
+
+        stage('Terraform Init / Validate / Plan') {
+            steps {
+                script {
+                    def stacks = env.TF_STACKS.split(',')
+
+                    for (stack in stacks) {
+                        echo "Running Terraform for ${stack}"
+
+                        dir(stack) {
+                            sh 'terraform init'
+                            sh 'terraform validate'
+                            sh 'terraform plan -no-color'
+                        }
+                    }
+                }
+            }
         }
-      }
+
+        stage('Terraform Apply') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    def stacks = env.TF_STACKS.split(',')
+
+                    for (stack in stacks) {
+                        echo "Applying Terraform for ${stack}"
+
+                        dir(stack) {
+                            sh 'terraform apply -auto-approve'
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
 }
