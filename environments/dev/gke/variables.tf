@@ -14,22 +14,6 @@ variable "cluster_name" {
   type = string
 }
 
-variable "network_name" {
-  type = string
-}
-
-variable "subnet_name" {
-  type = string
-}
-
-variable "pods_range_name" {
-  type = string
-}
-
-variable "services_range_name" {
-  type = string
-}
-
 variable "node_pool_name" {
   type = string
 }
