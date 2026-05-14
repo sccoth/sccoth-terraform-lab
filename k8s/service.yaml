@@ -6,6 +6,7 @@ spec:
   type: LoadBalancer
   selector:
     app: gcp-platform-lab
+    tier: frontend
   ports:
     - protocol: TCP
       port: 80
