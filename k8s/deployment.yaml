@@ -22,6 +22,7 @@ spec:
       containers:
         - name: gcp-platform-lab
           image: europe-west1-docker.pkg.dev/sccoth-dev/gcp-lab-repo/gcp-platform-lab:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:

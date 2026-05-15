@@ -1,6 +1,6 @@
 project_id = "sccoth-dev"
 region     = "europe-west1"
-zone       = "europe-west1-b"
+zone       = "europe-west1-d"
 
 cluster_name = "gcp-lab-cluster"
 
