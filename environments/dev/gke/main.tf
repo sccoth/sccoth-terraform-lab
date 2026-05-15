@@ -31,4 +31,4 @@ module "gke" {
   disk_size_gb   = var.disk_size_gb
 
 }
-# rebuild trigger
+# Rebuild Trigger
